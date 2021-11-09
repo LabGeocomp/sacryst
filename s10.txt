@@ -1,0 +1,24 @@
+*** config file - sphere test
+
+
+*** lower limit
+-100
+--
+
+*** upper limit
+100
+--
+
+*** number of variables
+10
+
+*** iteration and acceptance number by temperature
+100
+50
+
+*** initial and final temperature
+1e1
+1e-10000
+
+*** max number of iterations
+100000
