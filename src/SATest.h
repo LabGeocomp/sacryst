@@ -310,7 +310,7 @@ public:
 	double getAlfa(void) const { return this->pAlfa; };
 
 	// --> Set the storage for statistics
-	void setFilename(char *filename) { strcpy(this->filename, filename); };
+	void setFilename(const char *filename) { strcpy(this->filename, filename); };
 
 	// --> Add a new energy value
 	void pushEnergy(double value) { energy.push_back(value); };
@@ -432,6 +432,41 @@ class cSimulatedAnnealing{
 public:
 	cSimulatedAnnealing() {};
 	~cSimulatedAnnealing() {};
+
+	void init(std::vector<double> &lowerLimit, std::vector<double> &upperLimit, int numbvar, int iteractionNumber, int acceptedEquilibrium, double initT, double Final_Temp, int Max_iter, std::string &res, std::string &wfilename) {
+		this->Final_Temp = Final_Temp;
+		this->Max_iter = Max_iter;
+
+		// --> Initiate random number generator
+		long seed = GetTickCount();
+		init_genrand(seed);
+		// --> Reserve space for parameters
+		pListParameters.clear();
+
+		// --> Set storage for statistics
+		statistics.setFilename(wfilename.c_str());
+
+		// --> Configure parameters
+		interpreter.setParameters(&pListParameters);
+
+		// --> Read parameter file
+		pListParameters.clear();
+		for (const auto val: lowerLimit) { pListParameters.pushMin(val); } 
+		for (const auto val: upperLimit) { pListParameters.pushMax(val); } 
+		for (int aux = 0; aux < numbvar; aux++) pListParameters.addFloat(pListParameters.getMin(aux) + (pListParameters.getMax(aux) - pListParameters.getMin(aux))*genrand_real1());
+
+		pTa = initT;
+		pAccepted = pNotAccepted = 0;
+		pAlfa = 0.95;
+
+		firstShow = true;
+
+		resFilename = (char*)res.c_str();
+
+		this->pIteractionNumber = iteractionNumber;
+		this->pAcceptedEquilibrium = acceptedEquilibrium;
+
+	}
 
 	void init(char *rfilename, char *res, char *wfilename) {
 
@@ -572,7 +607,7 @@ public:
 	printf("End = %6.12f, %d, %d\n", pTa, pAccepted, pAccepted + pNotAccepted);
 	};
 
-	void write(char *filename) {
+	void write(const char *filename) {
 		interpreter.setParameters(&pListParametersBest);
 		FILE *fw = fopen(filename, "w");
 		fprintf(fw, "*** Exit File \n");
