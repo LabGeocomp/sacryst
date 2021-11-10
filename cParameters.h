@@ -24,7 +24,7 @@ public:
 	int getCrystallization(int index) { return crystallization[index]; };
 	int getaccepted(int index) { return accepted[index]; };
 	int getrejected(int index) { return rejected[index]; };
-	void verifycrystalization();
+	void verifyCrystallization();
 	double shuffle(int index);
 
 	int getNumberFloats(void) const { return (int)vFloats.size(); };

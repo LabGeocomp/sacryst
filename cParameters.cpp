@@ -100,7 +100,7 @@ void cParameters::decreaseCrystallization(int index, int pass) {
     accepted[index] ++;
 }
 
-void cParameters::verifycrystalization() {
+void cParameters::verifyCrystallization() {
     int i = 1000;
     while (i < vFloats.size()) {
         if (accepted[i] > rejected[i]) {
