@@ -9,7 +9,7 @@
 #include <math.h>  
 #include <chrono>
 
-#define C_LIMIT 50
+#define C_LIMIT 20
 #define BOLTZ 1
 
 unsigned seed_norm = std::chrono::system_clock::now().time_since_epoch().count();
@@ -188,7 +188,7 @@ public:
 			}
 		}
 		else{
-			std::normal_distribution<double> distribution(0.0, 1 / (double)(1 * exp(crystallization[index] + 1  - C_LIMIT)));
+			std::normal_distribution<double> distribution(0.0, 1 / (double)(1 * exp(crystallization[index] + 2  - C_LIMIT)));
 			while (val + vFloats[index] < getMin(index) || val + vFloats[index] > getMax(index) || count == 0) {
 				val = distribution(generator)*getStep(index);
 				count = 1;
@@ -491,6 +491,7 @@ public:
 		pTa = initT;
 		pAccepted = pNotAccepted = 0;
 		pAlfa = 0.95;
+		std_temp = 1000;
 
 		firstShow = true;
 
@@ -517,8 +518,12 @@ public:
 		pEnergyCandidate = cEneryCandidate;
 		pAccepted++;
 		statistics.pushEnergy(cEneryCandidate);
-		pListParameters.decreaseCrystallization(index, 1);
+		//pListParameters.decreaseCrystallization(index, 1);
 		//pListParameters.resetCrystallization(index);
+		if (std_temp > 100 ) pListParameters.resetCrystallization(index);
+		else {
+			pListParameters.decreaseCrystallization(index, 2);
+		}
 	};
 
 	void run(void) {
@@ -604,7 +609,7 @@ public:
 		std_temp  = sqrt(statistics.get_variance());
 		//pListParameters.verifycrystalization();
 	}
-	printf("End = %6.12f, %d, %d\n", pTa, pAccepted, pAccepted + pNotAccepted);
+	printf("End = %e, %e, %d, %d, %d\n", pEnergyCandidateBest, pTa, pAccepted, pAccepted + pNotAccepted, N_iter);
 	};
 
 	void write(const char *filename) {
