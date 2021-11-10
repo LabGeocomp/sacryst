@@ -275,9 +275,9 @@ public:
 		pEnergyCandidate = cEnergyCandidate;
 		pAccepted++;
 		statistics.pushEnergy(cEnergyCandidate);
-		if (std_temp > 100 ) pListParameters.resetCrystallization(index);
+		if (std_temp > 50 ) pListParameters.resetCrystallization(index);
 		else {
-			pListParameters.decreaseCrystallization(index, 2);
+			pListParameters.decreaseCrystallization(index, 3);
 		}
 	};
 
