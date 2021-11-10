@@ -24,7 +24,7 @@ add_executable(sacryst_rastrigin ${sacryst_SRCS} src/energies/rastrigin_energy.c
 target_compile_definitions(sacryst_rastrigin PRIVATE PRINT_INTERMEDIATE_RESULTS)
 target_compile_definitions(sacryst_rastrigin PRIVATE WRITE_STATISTICS)
 
-add_executable(sacryst_rosembrock ${sacryst_SRCS} src/energies/rosembrock_energy.cpp)
+add_executable(sacryst_rosembrock ${sacryst_SRCS} src/energies/rosenbrock_energy.cpp)
 target_compile_definitions(sacryst_rosembrock PRIVATE PRINT_INTERMEDIATE_RESULTS)
 target_compile_definitions(sacryst_rosembrock PRIVATE WRITE_STATISTICS)
 
