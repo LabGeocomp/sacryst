@@ -7,4 +7,4 @@ set(sacryst_SRCS
 )
 
 add_executable(sacryst ${sacryst_SRCS})
-# target_compile_definitions(sacryst PRIVATE PRINT_INTERMEDIATE_RESULTS)
+target_compile_definitions(sacryst PRIVATE PRINT_INTERMEDIATE_RESULTS)

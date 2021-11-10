@@ -6,6 +6,7 @@
 #include <random>
 #include <math.h>  
 #include <chrono>
+#include <fstream>
 
 #define C_LIMIT 20
 #define BOLTZ 1
@@ -560,34 +561,31 @@ public:
 		#endif
 	};
 
-	void write(const char *filename) {
+	void write(const std::string filename) {
 		interpreter.setParameters(&pListParametersBest);
-		FILE *fw = fopen(filename, "w");
-		fprintf(fw, "*** Exit File \n");
-		fprintf(fw, "\n\n");
-		fprintf(fw, "***  Variable Values Crystallization NUmber of Acceptance and Rejections \n");
+		std::ofstream fw;
+		fw.open(filename, std::ios_base::out);
+		if (!fw.is_open()) {
+        	std::cout << "Failed to open " << filename << " for writing results." << std::endl;;
+			return;
+    	}
+		fw << "*** Exit File " << std::endl;
+		fw << std::endl << std::endl;
+		fw << "***  Variable Values Crystallization NUmber of Acceptance and Rejections " << std::endl;
 		std::vector<double>::iterator itt = pListParametersBest.fbegin();
 		int i = 0;
-		while (itt != pListParametersBest.fend()) {
-			fprintf(fw, "%e %d %d %d \n", *itt, pListParametersBest.getCrystallization(i), pListParametersBest.getaccepted(i), pListParametersBest.getrejected(i));
-			itt++;
+		for(auto itt = pListParametersBest.fbegin(); itt != pListParametersBest.fend(); itt++) {
+			fw  << *itt << " " << pListParametersBest.getCrystallization(i) << " " << pListParametersBest.getaccepted(i) << " " << pListParametersBest.getrejected(i) << std::endl;
 			i++;
 		}
-		fprintf(fw, "---\n");
-		fprintf(fw, "\n\n");
-		fprintf(fw, "*** Cost\n");
-		fprintf(fw, "%e\n", pEnergyCandidateBest);
-		fprintf(fw, "\n\n");
-		fprintf(fw, "*** Number of iterations\n");
-		fprintf(fw, "%d\n", N_iter);
-		fclose(fw);
-	};
-
-	void write_best(char *filename) {
-		interpreter.setParameters(&pListParametersBest);
-		FILE *fw = fopen(filename, "a");
-		fprintf(fw, "%e %d\n", pEnergyCandidateBest, N_iter);
-		fclose(fw);
+		fw << "---" << std::endl;
+		fw << std::endl << std::endl;
+		fw << "*** Cost" << std::endl;
+		fw << pEnergyCandidateBest << std::endl;
+		fw << std::endl << std::endl;
+		fw << "*** Number of iterations" << std::endl;
+		fw << N_iter << std::endl;
+		fw.close();
 	};
 
 	// --> Criteria for stop
