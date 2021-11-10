@@ -255,7 +255,7 @@ public:
 	// --> Edit next float parameter
 	void goNextFloatParameter(void) {
 		if (parameters == (cParameters *)0) {
-			printf("There is no associated parameters.\n");
+			std::cout << "There is no associated parameters." << std::endl;
 			return;
 		}
 
@@ -269,12 +269,12 @@ public:
 	// --> Modify current float parameter
 	void modifyFloatParameter(double step) {
 		if (parameters == (cParameters *)0) {
-			printf("There is no associated parameters.\n");
+			std::cout << "There is no associated parameters." << std::endl;
 			return;
 		}
 
 		if (pEditFloat < 0) {
-			printf("There is no current float parameter set.\n");
+			std::cout << "There is no current float parameter set." << std::endl;
 			return;
 		}
 
@@ -538,7 +538,7 @@ public:
 				}
 				N_iter++;
 			}
-		printf("*** %e, %e, %d, %d, %d\n", pEnergyCandidateBest, pTa, pAccepted, pAccepted + pNotAccepted, N_iter);
+		std::cout << "*** " << pEnergyCandidateBest << ", " << pTa << ", " << pAccepted << ", " << (pAccepted + pNotAccepted) << ", " << N_iter << std:: endl;
 		statistics.print(pTa, pAccepted, pNotAccepted, N_iter);
 
 		// --> Retrieve new value for alfa
@@ -552,8 +552,8 @@ public:
 		statistics.clearEnergy();
 
 		std_temp  = sqrt(statistics.get_variance());
-	}
-	printf("End = %e, %e, %d, %d, %d\n", pEnergyCandidateBest, pTa, pAccepted, pAccepted + pNotAccepted, N_iter);
+		}
+		std::cout << "End = " << pEnergyCandidateBest << ", " << pTa << ", " << pAccepted << ", " << (pAccepted + pNotAccepted) << ", " << N_iter << std::endl;
 	};
 
 	void write(const char *filename) {
