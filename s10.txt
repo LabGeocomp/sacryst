@@ -13,8 +13,8 @@
 10
 
 *** iteration and acceptance number by temperature
-100
 50
+25
 
 *** initial and final temperature
 1e1
