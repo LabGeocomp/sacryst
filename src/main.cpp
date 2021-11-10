@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "include/args.hxx"
+#include "cParameters.h"
 #include "SATest.h"
 
 double calculateEnergy(cParameters &params);
@@ -77,6 +78,7 @@ int main(int argc, char **argv)
 }
 
 
+#ifdef CUSTOM_ENERGY
 // --> Definition of the cost function. 
 double calculateEnergy(cParameters &params)
 {
@@ -88,3 +90,4 @@ double calculateEnergy(cParameters &params)
 	}
 	return val;
 }
+#endif

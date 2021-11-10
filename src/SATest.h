@@ -1,6 +1,8 @@
 #ifndef _SATEST_
 #define _SATEST_
 
+#include "cParameters.h"
+
 #include <vector>
 #include <iostream>
 #include <random>
@@ -8,7 +10,6 @@
 #include <chrono>
 #include <fstream>
 
-#define C_LIMIT 20
 #define BOLTZ 1
 
 auto seed_norm = std::chrono::system_clock::now().time_since_epoch().count();
@@ -18,202 +19,6 @@ double genrand_real1(void) {
 	std::uniform_real_distribution<double> distribution(0.0, 1.0);
 	return distribution(generator);
 }
-
-// --> This class represents the parameters
-class cParameters {
-public:
-	cParameters() {};
-	~cParameters() {};
-
-	typedef std::vector<double>::iterator fIterator;
-	typedef std::vector<double>::const_iterator  const_fIterator;
-	typedef std::vector<int>::iterator iIterator;
-	typedef std::vector<int>::const_iterator  const_iIterator;
-
-	// --> Iterators operation
-	fIterator fbegin(void) { return vFloats.begin(); };
-	const_fIterator fbegin(void) const { return vFloats.begin(); };
-	fIterator fend(void) { return vFloats.end(); };
-	const_fIterator fend(void) const { return vFloats.end(); };
-	iIterator ibegin(void) { return vInts.begin(); };
-	const_iIterator ibegin(void) const { return vInts.begin(); };
-	iIterator iend(void) { return vInts.end(); };
-	const_iIterator iend(void) const { return vInts.end(); };
-
-
-	// --> Retrive the num-th integer parameter
-	int getIntParameter(int num) {
-		if (num < 0 || num >(int)(vInts.size() - 1)) return 0;
-		int cont = 0; iIterator it = ibegin();
-		while (cont != num && it != iend()) {
-			cont++; it++;
-		}
-		return *it;
-	};
-
-	// --> Set the num-th integer parameter
-	void setIntParameter(int num, int param) {
-		if (num < 0 || num >(int)(vInts.size() - 1)) return;
-		int cont = 0; iIterator it = ibegin();
-		while (cont != num && it != iend()) {
-			cont++; it++;
-		}
-		*it = param;
-	};
-
-	// --> Retrive the num-th flaot parameter
-	double getFloatParameter(int num) {
-		if (num < 0 || num >(int)(vFloats.size() - 1)) return 0.0;
-		int cont = 0; fIterator it = fbegin();
-		while (cont != num && it != fend()) {
-			cont++; it++;
-		}
-		return *it;
-	};
-
-	// --> Set the num-th Float parameter
-	void setFloatParameter(int num, double param) {
-		if (num < 0 || num >(int)(vFloats.size() - 1)) return;
-		int cont = 0; fIterator it = fbegin();
-		while (cont != num && it != fend()) {
-			cont++; it++;
-		}
-		*it = param;
-	};
-
-	int getNumberFloats(void) const { return (int)vFloats.size(); };
-	int getNumberInts(void) const { return (int)vInts.size(); };
-
-	void clear(void) {
-		vFloats.clear();
-		vInts.clear();
-		crystallization.clear();
-		accepted.clear();
-		rejected.clear();
-	};
-
-	void addFloat(double val) { vFloats.push_back(val); crystallization.push_back(0); accepted.push_back(0); rejected.push_back(0); };
-	void addInt(int n) { vInts.push_back(n); };
-
-	void setMax(std::vector<double> max) { this->max = max; };
-	std::vector<double> getMax(void) const { return this->max; };
-	void setMin(std::vector<double> min) { this->min = min; };
-	std::vector<double> getMin(void) const { return this->min; };
-
-	void pushMax(double val){
-		max.push_back(val);
-	};
-
-	void pushMin(double val){
-		min.push_back(val);
-	};
-
-	double getMin(int index) const {
-		return min[0];
-	};
-
-	double getMax(int index) const {
-		return max[0];
-	};
-
-	double getStep(int index) const {
-		return max[0] - min[0];
-	};
-
-	void incrementCrystallization(int index) {
-		if (index + 1 > 0)
-			if (crystallization[index] < 5000000)
-			crystallization[index] ++;
-
-		rejected[index] ++;
-
-	};
-	void resetCrystallization(int index) {
-		if (index + 1 > 0) {
-			if (crystallization[index] > 0) {
-				crystallization[index] = 0 ;
-			}
-			if (crystallization[index] < 0)
-				crystallization[index] = 0;
-		}
-		accepted[index] ++;
-	};
-
-	void decreaseCrystallization(int index, int pass) {
-		if (index + 1 > 0) {
-			if (crystallization[index] > 0) {
-				crystallization[index] -=pass;
-			}
-			if (crystallization[index] < 0)
-				crystallization[index] = 0;
-		}
-		accepted[index] ++;
-	};
-
-	int getCrystallization(int index) { return crystallization[index]; };
-
-	int getaccepted(int index) { return accepted[index]; };
-
-	int getrejected(int index) { return rejected[index]; };
-
-	void verifycrystalization() {
-		int i = 1000;
-		while (i < vFloats.size()) {
-			if (accepted[i] > rejected[i]) {
-				crystallization[i] /=2;
-			}
-			accepted[i] = 0;
-			rejected[i] = 0;
-			i++;
-		}
-	}
-
-	double shuffle(int index) {
-		double val = getMax(index);
-		int count = 0;
-		if (crystallization[index] < C_LIMIT) {
-			while (val + vFloats[index] < getMin(index) || val + vFloats[index] > getMax(index) || count == 0) {
-				val = 0;
-				for (int k = 0; k < crystallization[index] + 1; k++)
-					val += genrand_real1();
-				val /= (double)(crystallization[index] + 1);
-				val -= 0.5;
-				val *= getStep(index);
-				count = 1;
-			}
-		}
-		else{
-			std::normal_distribution<double> distribution(0.0, 1 / (double)(1 * exp(crystallization[index] + 2  - C_LIMIT)));
-			while (val + vFloats[index] < getMin(index) || val + vFloats[index] > getMax(index) || count == 0) {
-				val = distribution(generator)*getStep(index);
-				count = 1;
-			}
-		}
-
-		vFloats[index] += val;
-		return val;
-	};
-
-
-
-private:
-
-	// --> Vector of Floats
-	std::vector<double> vFloats;
-
-	// --> Vector of Integers
-	std::vector<int> vInts;
-
-	// --> Parameter range
-	std::vector<double> min, max;
-
-	// --> Cristallization factor for this parameter
-	std::vector<int> crystallization;
-
-	// --> accepted and rejected by parameter
-	std::vector<int> accepted;
-	std::vector<int> rejected;
-};
 
 class cInterpretParameters {
 public:
