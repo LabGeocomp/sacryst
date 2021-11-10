@@ -300,6 +300,7 @@ public:
 
 	void init(void) {
 		first = true;
+		#ifdef WRITE_STATISTICS
 		std::ofstream fp;
 		fp.open(filename, std::ios_base::out);
 		if (!fp.is_open()) {
@@ -308,6 +309,7 @@ public:
     	}
 		fp << "pTa, tMinE, tMaxE, tMedia, tVariance, tSpecifHeat, tVarCost, tAvgSquare, tAvgCost, sum, pAlfa, pAccepted, pNotAccepted, N_iter" << std::endl;
 		fp.close();
+		#endif
 	};
 
 	// --> Retrieve new value for alfa
@@ -384,6 +386,7 @@ public:
 		if (isnan(pAlfa)) pAlfa = 0.99;
 		if (pAlfa < 0.8) pAlfa = 0.8;
 
+		#ifdef WRITE_STATISTICS
 		std::ofstream fp;
 		fp.open(filename, std::ios_base::out|std::ios_base::app);
 		if (!fp.is_open()) {
@@ -392,6 +395,7 @@ public:
     	}
 		fp << pTa << "; " << tMinE << "; " << tMaxE << "; " << tMedia << "; " << tVariance << "; " << tSpecifHeat << "; " << tVarCost << "; " << tAvgSquare << "; " << tAvgCost << "; " << sum << "; " << pAlfa << "; " << pAccepted << "; " << pNotAccepted << "; " << N_iter << "; " << std_amost << std::endl;
 		fp.close();
+		#endif
 	};
 
 	double get_variance(void) { return this->tVarCost; };
