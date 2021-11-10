@@ -52,6 +52,7 @@ public:
 
 	void pushMax(double val){ max.push_back(val); };
 	void pushMin(double val){ min.push_back(val); };
+	// TODO: use individual limits
 	double getMin(int index) const { return min[0]; };
 	double getMax(int index) const { return max[0]; };
 	double getStep(int index) const { return max[0] - min[0]; };
