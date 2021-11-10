@@ -4,7 +4,6 @@ include_directories(src)
 
 set(sacryst_SRCS 
   src/main.cpp
-  src/mt19937ar_c.cpp
 )
 
 add_executable(sacryst ${sacryst_SRCS})

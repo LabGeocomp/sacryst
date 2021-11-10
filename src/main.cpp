@@ -2,8 +2,6 @@
 #include "include/args.hxx"
 #include "SATest.h"
 
-using namespace std;
-
 double calculateEnergy(cParameters &params);
 
 cSimulatedAnnealing SA;
@@ -70,12 +68,10 @@ int main(int argc, char **argv)
 	SA.init(lowerVec, upperVec, args::get(numvars), args::get(maxits), args::get(maxaccept), args::get(inittemp), args::get(finaltemp), args::get(totalits), outfileStr, statoutfile);
 
 	SA.setCalculateEnergyFunction(calculateEnergy);
-	cout << "RUN" << endl;
+	std::cout << "RUN" << std::endl;
 	SA.run();
 
 	SA.write(outfileStr.c_str());
-	
-	//SA.write_best("Cost_benchmark.txt");
 	
     return 0;
 }
@@ -84,7 +80,7 @@ int main(int argc, char **argv)
 // --> Definition of the cost function. 
 double calculateEnergy(cParameters &params)
 {
-	vector<double>::iterator itt = params.fbegin();
+	std::vector<double>::iterator itt = params.fbegin();
 	double val = 0;
 	while (itt != params.fend()){
 		val += (*itt)*(*itt);

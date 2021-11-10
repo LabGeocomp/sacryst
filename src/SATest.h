@@ -12,12 +12,13 @@
 #define C_LIMIT 20
 #define BOLTZ 1
 
-unsigned seed_norm = std::chrono::system_clock::now().time_since_epoch().count();
-std::default_random_engine generator(seed_norm);
-using namespace std;
+auto seed_norm = std::chrono::system_clock::now().time_since_epoch().count();
+std::mt19937 generator(seed_norm);
 
-double genrand_real1(void);
-void init_genrand(unsigned long s);
+double genrand_real1(void) {
+	std::uniform_real_distribution<double> distribution(0.0, 1.0);
+	return distribution(generator);
+}
 
 // --> This class represents the parameters
 class cParameters {
@@ -25,10 +26,10 @@ public:
 	cParameters() {};
 	~cParameters() {};
 
-	typedef vector<double>::iterator fIterator;
-	typedef vector<double>::const_iterator  const_fIterator;
-	typedef vector<int>::iterator iIterator;
-	typedef vector<int>::const_iterator  const_iIterator;
+	typedef std::vector<double>::iterator fIterator;
+	typedef std::vector<double>::const_iterator  const_fIterator;
+	typedef std::vector<int>::iterator iIterator;
+	typedef std::vector<int>::const_iterator  const_iIterator;
 
 	// --> Iterators operation
 	fIterator fbegin(void) { return vFloats.begin(); };
@@ -95,10 +96,10 @@ public:
 	void addFloat(double val) { vFloats.push_back(val); crystallization.push_back(0); accepted.push_back(0); rejected.push_back(0); };
 	void addInt(int n) { vInts.push_back(n); };
 
-	void setMax(vector<double> max, int imax) { this->max = max; this->imax = imax; };
-	vector<double> getMax(void) const { return this->max; };
-	void setMin(vector<double> min, int imin) { this->min = min; this->imin = imin; };
-	vector<double> getMin(void) const { return this->min; };
+	void setMax(std::vector<double> max, int imax) { this->max = max; this->imax = imax; };
+	std::vector<double> getMax(void) const { return this->max; };
+	void setMin(std::vector<double> min, int imin) { this->min = min; this->imin = imin; };
+	std::vector<double> getMin(void) const { return this->min; };
 
 	void pushMax(double val){
 		max.push_back(val);
@@ -204,23 +205,23 @@ public:
 private:
 
 	// --> Vector of Floats
-	vector<double> vFloats;
+	std::vector<double> vFloats;
 
 	// --> Vector of Integers
-	vector<int> vInts;
+	std::vector<int> vInts;
 
 	// --> Parameter range
-	vector<double> min, max;
+	std::vector<double> min, max;
 
 	// --> Pointer to first and last points
 	int first, last, imin, imax;
 
 	// --> Cristallization factor for this parameter
-	vector<int> crystallization;
+	std::vector<int> crystallization;
 
 	// --> accepted and rejected by parameter
-	vector<int> accepted;
-	vector<int> rejected;
+	std::vector<int> accepted;
+	std::vector<int> rejected;
 };
 
 class cInterpretParameters {
@@ -333,7 +334,7 @@ public:
 	// --> Calculate the statistics
 	void print(double pTa, int pAccepted, int pNotAccepted, int N_iter) {
 
-		vector<double>::iterator itf = energy.begin();
+		std::vector<double>::iterator itf = energy.begin();
 		double sum = 0, tMinE = *itf, tMaxE = *itf;
 		for (itf = energy.begin(); itf != energy.end(); itf++) {
 			if (tMinE > *itf) tMinE = *itf;
@@ -341,12 +342,12 @@ public:
 			sum += exp(-(*itf) /( BOLTZ*(pTa)));
 		}
 
-		vector<double> PiT;
+		std::vector<double> PiT;
 		for (itf = energy.begin(); itf != energy.end(); itf++)
 			PiT.push_back(1.0/energy.size());
 
 		double tAvgCost = 0, tAvgSquare = 0;
-		vector<double>::iterator itg = energy.begin();
+		std::vector<double>::iterator itg = energy.begin();
 		for (itf = PiT.begin(); itf != PiT.end(); itf++, itg++) {
 			tAvgCost += (*itf) * (*itg);
 			tAvgSquare += (*itf) * (*itg) * (*itg);
@@ -402,7 +403,7 @@ public:
 	double get_variance(void) { return this->tVarCost; };
 
 private:
-	vector<double> energy;
+	std::vector<double> energy;
 
 	// --> File to store statistics
 	char filename[100];
@@ -426,8 +427,6 @@ private:
 	double tVarCost;
 };
 
-void readParameterFile(char *filename, cParameters &params, int &iteractionNumber, int &acceptedEquilibrium, double &initT, double &Final_Temp, int &Max_iter);
-
 class cSimulatedAnnealing{
 public:
 	cSimulatedAnnealing() {};
@@ -437,9 +436,6 @@ public:
 		this->Final_Temp = Final_Temp;
 		this->Max_iter = Max_iter;
 
-		// --> Initiate random number generator
-		long seed = GetTickCount();
-		init_genrand(seed);
 		// --> Reserve space for parameters
 		pListParameters.clear();
 
@@ -467,40 +463,6 @@ public:
 		this->pAcceptedEquilibrium = acceptedEquilibrium;
 
 	}
-
-	void init(char *rfilename, char *res, char *wfilename) {
-
-		int iteractionNumber;
-		int acceptedEquilibrium;
-		double initT;
-		// --> Initiate random number generator
-		long seed = GetTickCount();
-		init_genrand(seed);
-		// --> Reserve space for parameters
-		pListParameters.clear();
-
-		// --> Set storage for statistics
-		statistics.setFilename(wfilename);
-
-		// --> Configure parameters
-		interpreter.setParameters(&pListParameters);
-
-		// --> Read parameter file
-		readParameterFile(rfilename, pListParameters, iteractionNumber, acceptedEquilibrium, initT, Final_Temp, Max_iter);
-
-		pTa = initT;
-		pAccepted = pNotAccepted = 0;
-		pAlfa = 0.95;
-		std_temp = 1000;
-
-		firstShow = true;
-
-		resFilename = res;
-
-		this->pIteractionNumber = iteractionNumber;
-		this->pAcceptedEquilibrium = acceptedEquilibrium;
-
-	};
 
 	void setValue(int index, double value) { pListParameters.setFloatParameter(index, value); };
 
@@ -578,7 +540,6 @@ public:
 					}
 				}
 
-				checkKeyBoard();
 				// --> Check for best ever candidate
 				if ((pEnergyCandidateBest > cEnergyCandidate) || firstShow) {
 					if (pEnergyCandidateBest > cEnergyCandidate) {
@@ -618,7 +579,7 @@ public:
 		fprintf(fw, "*** Exit File \n");
 		fprintf(fw, "\n\n");
 		fprintf(fw, "***  Variable Values Crystallization NUmber of Acceptance and Rejections \n");
-		vector<double>::iterator itt = pListParametersBest.fbegin();
+		std::vector<double>::iterator itt = pListParametersBest.fbegin();
 		int i = 0;
 		while (itt != pListParametersBest.fend()) {
 			fprintf(fw, "%e %d %d %d \n", *itt, pListParametersBest.getCrystallization(i), pListParametersBest.getaccepted(i), pListParametersBest.getrejected(i));
@@ -702,8 +663,6 @@ public:
 
 	cInterpretParameters interpreter;
 
-	void checkKeyBoard(void);
-
 	bool firstShow;
 
 	char *resFilename;
@@ -715,76 +674,5 @@ public:
 	int std_mag;
 
 };
-
-void readParameterFile(char *filename, cParameters &params, int &iteractionNumber, int &acceptedEquilibrium, double &initT, double &Final_Temp, int &Max_iter)
-{
-	FILE *fr = fopen(filename, "r");
-	if (fr == (FILE *)0) {
-		printf("There is no file %s\n", filename);
-		return;
-	}
-
-	long seed1 = GetTickCount();
-	init_genrand(seed1);
-
-	params.clear();
-	int id = 0;
-	char line[500];
-	fgets(line, 400, fr);
-	fgets(line, 400, fr);
-	fgets(line, 400, fr);
-	fgets(line, 400, fr);
-// --> Sets the lower limit
-	while (true) {
-		fgets(line, 400, fr);
-		if (line[0] == '-' && line[1] == '-')
-			break;
-		double val = atof(line);
-		params.pushMin(val);
-	}
-	fgets(line, 400, fr);
-	fgets(line, 400, fr);
-// --> Sets the upper limit
-	while (true) {
-		fgets(line, 400, fr);
-		if (line[0] == '-' && line[1] == '-')
-			break;
-		double val = atof(line);
-		params.pushMax(val);
-	}
-	fgets(line, 400, fr);
-	fgets(line, 400, fr);
-// --> Sets the number of variables and randomly initiate the variable initial values
-	fgets(line, 400, fr);
-	int numbvar = atoi(line);
-	int aux = 0;
-	while (aux < numbvar){
-		double aux_val = params.getMin(aux) + (params.getMax(aux) - params.getMin(aux))*genrand_real1();
-		params.addFloat(aux_val);
-		aux++;
-	}
-// --> Sets the number of iterations and acceptances by temperature
-	fgets(line, 400, fr);
-	fgets(line, 400, fr);
-	fgets(line, 400, fr);
-	iteractionNumber = atoi(line);
-	fgets(line, 400, fr);
-	acceptedEquilibrium = atoi(line);
-
-// --> Sets the initial and final tempertature
-	fgets(line, 400, fr);
-	fgets(line, 400, fr);
-	fgets(line, 400, fr);
-	initT = atof(line);
-	fgets(line, 400, fr);
-	Final_Temp = atof(line);
-
-// --> Sets the maximum number of iterations
-	fgets(line, 400, fr);
-	fgets(line, 400, fr);
-	fgets(line, 400, fr);
-	Max_iter = atoi(line);
-	fclose(fr);
-}
 
 #endif	/* _SATEST_ */
