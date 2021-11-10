@@ -7,6 +7,4 @@ set(sacryst_SRCS
 )
 
 add_executable(sacryst ${sacryst_SRCS})
-set_property(TARGET sacryst PROPERTY CXX_STANDARD 17)
-set_property(TARGET sacryst PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(TARGET sacryst PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+# target_compile_definitions(sacryst PRIVATE PRINT_INTERMEDIATE_RESULTS)

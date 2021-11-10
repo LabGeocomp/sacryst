@@ -538,7 +538,9 @@ public:
 				}
 				N_iter++;
 			}
+		#ifdef PRINT_INTERMEDIATE_RESULTS
 		std::cout << "*** " << pEnergyCandidateBest << ", " << pTa << ", " << pAccepted << ", " << (pAccepted + pNotAccepted) << ", " << N_iter << std:: endl;
+		#endif
 		statistics.print(pTa, pAccepted, pNotAccepted, N_iter);
 
 		// --> Retrieve new value for alfa
@@ -553,7 +555,9 @@ public:
 
 		std_temp  = sqrt(statistics.get_variance());
 		}
+		#ifdef PRINT_INTERMEDIATE_RESULTS
 		std::cout << "End = " << pEnergyCandidateBest << ", " << pTa << ", " << pAccepted << ", " << (pAccepted + pNotAccepted) << ", " << N_iter << std::endl;
+		#endif
 	};
 
 	void write(const char *filename) {
