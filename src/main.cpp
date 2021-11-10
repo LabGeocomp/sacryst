@@ -74,7 +74,9 @@ int main(int argc, char **argv)
 	SA.run();
 
 	SA.write(outfileStr.c_str());
-
+	
+	//SA.write_best("Cost_benchmark.txt");
+	
     return 0;
 }
 
@@ -89,17 +91,4 @@ double calculateEnergy(cParameters &params)
 		itt++;
 	}
 	return val;
-}
-
-
-void cSimulatedAnnealing::checkKeyBoard(void)
-{
-	if (_kbhit()) {
-		char key = _getch();
-		if (key == 'q') {
-			SA.write(resFilename);
-			SA.write_best("Cost_benchmark.txt");
-			exit(1);
-		}
-	}
 }
