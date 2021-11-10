@@ -95,9 +95,9 @@ public:
 	void addFloat(double val) { vFloats.push_back(val); crystallization.push_back(0); accepted.push_back(0); rejected.push_back(0); };
 	void addInt(int n) { vInts.push_back(n); };
 
-	void setMax(std::vector<double> max, int imax) { this->max = max; this->imax = imax; };
+	void setMax(std::vector<double> max) { this->max = max; };
 	std::vector<double> getMax(void) const { return this->max; };
-	void setMin(std::vector<double> min, int imin) { this->min = min; this->imin = imin; };
+	void setMin(std::vector<double> min) { this->min = min; };
 	std::vector<double> getMin(void) const { return this->min; };
 
 	void pushMax(double val){
@@ -119,11 +119,6 @@ public:
 	double getStep(int index) const {
 		return max[0] - min[0];
 	};
-
-	int getLast(void) const { return this->last; };
-	void setLast(int last) { this->last = last; };
-	int getFirst(void) const { return this->first; };
-	void setFirst(int first) { this->first = first; };
 
 	void incrementCrystallization(int index) {
 		if (index + 1 > 0)
@@ -211,9 +206,6 @@ private:
 
 	// --> Parameter range
 	std::vector<double> min, max;
-
-	// --> Pointer to first and last points
-	int first, last, imin, imax;
 
 	// --> Cristallization factor for this parameter
 	std::vector<int> crystallization;
@@ -445,8 +437,8 @@ public:
 
 		// --> Read parameter file
 		pListParameters.clear();
-		for (const auto val: lowerLimit) { pListParameters.pushMin(val); } 
-		for (const auto val: upperLimit) { pListParameters.pushMax(val); } 
+		pListParameters.setMin(lowerLimit);
+		pListParameters.setMax(upperLimit);
 		for (int aux = 0; aux < numbvar; aux++) pListParameters.addFloat(pListParameters.getMin(aux) + (pListParameters.getMax(aux) - pListParameters.getMin(aux))*genrand_real1());
 
 		pTa = initT;
