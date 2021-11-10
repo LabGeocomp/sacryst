@@ -1,5 +1,5 @@
-#ifndef _SATEST_
-#define _SATEST_
+#ifndef _SA_
+#define _SA_
 
 #include "cParameters.h"
 
@@ -466,4 +466,4 @@ public:
 
 };
 
-#endif	/* _SATEST_ */
+#endif	/* _SA_ */

@@ -1,7 +1,7 @@
 #include <algorithm>
-#include "include/args.hxx"
+#include "args.hxx"
 #include "cParameters.h"
-#include "SATest.h"
+#include "sa.h"
 
 double calculateEnergy(cParameters &params);
 
