@@ -460,14 +460,12 @@ public:
 		this->calculateEnergy = calculateEnergy;
 	};
 
-	void acceptedCandidate(long index, double cEneryCandidate) {
+	void acceptedCandidate(long index, double cEnergyCandidate) {
 		pListParameters = pListParametersCandidates;
 		interpreter.setParameters(&pListParameters);
-		pEnergyCandidate = cEneryCandidate;
+		pEnergyCandidate = cEnergyCandidate;
 		pAccepted++;
-		statistics.pushEnergy(cEneryCandidate);
-		//pListParameters.decreaseCrystallization(index, 1);
-		//pListParameters.resetCrystallization(index);
+		statistics.pushEnergy(cEnergyCandidate);
 		if (std_temp > 100 ) pListParameters.resetCrystallization(index);
 		else {
 			pListParameters.decreaseCrystallization(index, 2);
@@ -554,7 +552,6 @@ public:
 		statistics.clearEnergy();
 
 		std_temp  = sqrt(statistics.get_variance());
-		//pListParameters.verifycrystalization();
 	}
 	printf("End = %e, %e, %d, %d, %d\n", pEnergyCandidateBest, pTa, pAccepted, pAccepted + pNotAccepted, N_iter);
 	};
@@ -591,12 +588,10 @@ public:
 
 	// --> Criteria for stop
 	bool stopCriteria(void) {
-		//return ((double)pAccepted) / ((double)(pAccepted + pNotAccepted)) > 0.01 || firstShow;
 		return (pTa > Final_Temp || firstShow) && N_iter < Max_iter;
 	};
 
 	// --> Determine the next temperature
-	//double nextTemperature(void) { return pTa * 0.99; };
 	double nextTemperature(void) { return pTa * pAlfa;};
 
 	// --> Criterium for equilibrium
