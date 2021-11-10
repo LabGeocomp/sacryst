@@ -2,8 +2,6 @@
 #define _SATEST_
 
 #include <vector>
-#include "conio.h "
-#include "windows.h"
 #include <iostream>
 #include <random>
 #include <math.h>  
@@ -319,18 +317,6 @@ public:
 	// --> clear energy vactor
 	void clearEnergy() { energy.clear(); };
 
-	boolean FPClass(double x)
-	{
-		int i = _fpclass(x);
-		boolean s = false;
-		switch (i)
-		{
-		case _FPCLASS_SNAN: s = true;					 break;
-		case _FPCLASS_QNAN: s = true;                    break;
-		}
-		return s;
-	}
-
 	// --> Calculate the statistics
 	void print(double pTa, int pAccepted, int pNotAccepted, int N_iter) {
 
@@ -390,7 +376,7 @@ public:
 		pLastVariance = tVariance;
 		pLastVarCost = tVarCost;
 		pAlfa = exp(-(0.05 * pTa) / sqrt(tVarCost));
-		if (FPClass(pAlfa) == true) pAlfa = 0.99;
+		if (isnan(pAlfa)) pAlfa = 0.99;
 		if (pAlfa < 0.8) pAlfa = 0.8;
 		FILE *fp = fopen(filename, "a");
 
