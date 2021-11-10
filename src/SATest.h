@@ -12,7 +12,7 @@
 #define BOLTZ 1
 
 auto seed_norm = std::chrono::system_clock::now().time_since_epoch().count();
-std::mt19937 generator(seed_norm);
+std::mt19937 generator((unsigned int)seed_norm);
 
 double genrand_real1(void) {
 	std::uniform_real_distribution<double> distribution(0.0, 1.0);
@@ -300,17 +300,21 @@ public:
 
 	void init(void) {
 		first = true;
-		FILE *fp = fopen(filename, "w");
-		fprintf(fp,
-			"pTa, tMinE, tMaxE, tMedia, tVariance, tSpecifHeat, tVarCost, tAvgSquare, tAvgCost, sum, pAlfa, pAccepted, pNotAccepted, N_iter\n");
-		fclose(fp);
+		std::ofstream fp;
+		fp.open(filename, std::ios_base::out);
+		if (!fp.is_open()) {
+        	std::cout << "Failed to open " << filename << " for writing statistics." << std::endl;
+			return;
+    	}
+		fp << "pTa, tMinE, tMaxE, tMedia, tVariance, tSpecifHeat, tVarCost, tAvgSquare, tAvgCost, sum, pAlfa, pAccepted, pNotAccepted, N_iter" << std::endl;
+		fp.close();
 	};
 
 	// --> Retrieve new value for alfa
 	double getAlfa(void) const { return this->pAlfa; };
 
 	// --> Set the storage for statistics
-	void setFilename(const char *filename) { strcpy(this->filename, filename); };
+	void setFilename(std::string &filename) { this->filename = std::string(filename); };
 
 	// --> Add a new energy value
 	void pushEnergy(double value) { energy.push_back(value); };
@@ -379,12 +383,15 @@ public:
 		pAlfa = exp(-(0.05 * pTa) / sqrt(tVarCost));
 		if (isnan(pAlfa)) pAlfa = 0.99;
 		if (pAlfa < 0.8) pAlfa = 0.8;
-		FILE *fp = fopen(filename, "a");
 
-		fprintf(fp,
-			"%e; %e; %e; %e; %e; %e; %e; %e; %e; %e; %e; %d; %d %d %e\n",
-			pTa, tMinE, tMaxE, tMedia, tVariance, tSpecifHeat, tVarCost, tAvgSquare, tAvgCost, sum, pAlfa, pAccepted, pNotAccepted, N_iter, std_amost);
-		fclose(fp);
+		std::ofstream fp;
+		fp.open(filename, std::ios_base::out|std::ios_base::app);
+		if (!fp.is_open()) {
+        	std::cout << "Failed to open " << filename << " for writing appended statistics." << std::endl;;
+			return;
+    	}
+		fp << pTa << "; " << tMinE << "; " << tMaxE << "; " << tMedia << "; " << tVariance << "; " << tSpecifHeat << "; " << tVarCost << "; " << tAvgSquare << "; " << tAvgCost << "; " << sum << "; " << pAlfa << "; " << pAccepted << "; " << pNotAccepted << "; " << N_iter << "; " << std_amost << std::endl;
+		fp.close();
 	};
 
 	double get_variance(void) { return this->tVarCost; };
@@ -393,7 +400,7 @@ private:
 	std::vector<double> energy;
 
 	// --> File to store statistics
-	char filename[100];
+	std::string filename;
 
 	// --> Last variational cost
 	double pLastVarCost;
@@ -427,7 +434,7 @@ public:
 		pListParameters.clear();
 
 		// --> Set storage for statistics
-		statistics.setFilename(wfilename.c_str());
+		statistics.setFilename(wfilename);
 
 		// --> Configure parameters
 		interpreter.setParameters(&pListParameters);
@@ -539,22 +546,22 @@ public:
 				}
 				N_iter++;
 			}
-		#ifdef PRINT_INTERMEDIATE_RESULTS
-		std::cout << "*** " << pEnergyCandidateBest << ", " << pTa << ", " << pAccepted << ", " << (pAccepted + pNotAccepted) << ", " << N_iter << std:: endl;
-		#endif
-		statistics.print(pTa, pAccepted, pNotAccepted, N_iter);
+			#ifdef PRINT_INTERMEDIATE_RESULTS
+			std::cout << "*** " << pEnergyCandidateBest << ", " << pTa << ", " << pAccepted << ", " << (pAccepted + pNotAccepted) << ", " << N_iter << std:: endl;
+			#endif
+			statistics.print(pTa, pAccepted, pNotAccepted, N_iter);
 
-		// --> Retrieve new value for alfa
-		pAlfa = statistics.getAlfa();
+			// --> Retrieve new value for alfa
+			pAlfa = statistics.getAlfa();
 
-		// --> Go to next temperature
-		if (pTa > pow(10,-1000)){
-			pTa = nextTemperature(); };
+			// --> Go to next temperature
+			if (pTa > pow(10,-1000)){
+				pTa = nextTemperature(); };
 
-		// --> purge energy vector
-		statistics.clearEnergy();
+			// --> purge energy vector
+			statistics.clearEnergy();
 
-		std_temp  = sqrt(statistics.get_variance());
+			std_temp  = sqrt(statistics.get_variance());
 		}
 		#ifdef PRINT_INTERMEDIATE_RESULTS
 		std::cout << "End = " << pEnergyCandidateBest << ", " << pTa << ", " << pAccepted << ", " << (pAccepted + pNotAccepted) << ", " << N_iter << std::endl;
