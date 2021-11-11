@@ -275,7 +275,7 @@ public:
 		pEnergyCandidate = cEnergyCandidate;
 		pAccepted++;
 		statistics.pushEnergy(cEnergyCandidate);
-		if (std_temp > 50 ) pListParameters.resetCrystallization(index);
+		if (std_temp > 10 ) pListParameters.resetCrystallization(index);
 		else {
 			pListParameters.decreaseCrystallization(index, 3);
 		}
@@ -335,14 +335,9 @@ public:
 
 				// --> Check for best ever candidate
 				if ((pEnergyCandidateBest > cEnergyCandidate) || firstShow) {
-					if (pEnergyCandidateBest > cEnergyCandidate) {
-						pListParametersBest = pListParameters;
-						pEnergyCandidateBest = cEnergyCandidate;
-						bestCont++;
-					}
-					pListParameters = pListParametersBest;
-					interpreter.setParameters(&pListParameters);
-					pEnergyCandidate = (*calculateEnergy)(pListParameters);
+					pListParametersBest = pListParameters;
+					pEnergyCandidateBest = cEnergyCandidate;
+					bestCont++;
 					firstShow = false;
 				}
 				N_iter++;
